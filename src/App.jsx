@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import "./App.css";
+import Card from "./Components/Card/Card";
+import Footer from "./Components/Footer/Footer";
+import Header from "./Components/Header/Header";
+import Searchbar from "./Components/Card/Searchbar";
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const App = () => {
+  const [allRecettes, setAllRecettes] = useState(null);
+  const [filteredRecettes, setFilteredRecettes] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/recettes.json');
+        if (!response.ok) {
+          throw new Error('La requête a échoué.');
+        }
+
+        const donneesJson = await response.json();
+        setAllRecettes(donneesJson);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données :', error.message);
+      }
+    };
+
+    fetchData();
+
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <Header />
+      <main>
+        <h1 className="relative rounded-full bg-white-800 p-1 text-red-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800" >Let's Cook</h1>
+        <Searchbar setFilteredRecettes={setFilteredRecettes}></Searchbar> 
+        <div className='mx-auto container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2'>
+        {(filteredRecettes.length > 0 ? filteredRecettes : allRecettes) && (filteredRecettes.length > 0 ? filteredRecettes : allRecettes).map(recipe => (
+          <Card key={recipe.id} recipe={recipe} />
+        ))}
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;
+
+
+   
+      
+
+
+       
+
